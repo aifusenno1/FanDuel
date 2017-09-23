@@ -1,0 +1,144 @@
+import java.io.*;
+import java.util.*;
+
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.read.biff.BiffException;
+import jxl.write.Label;
+import jxl.write.Number;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+import jxl.write.WriteException;
+import jxl.write.biff.RowsExceededException;
+
+public class Optimizer {
+
+	public static void main(String[] args) throws IOException, BiffException,
+			RowsExceededException, WriteException {
+		Workbook wb = Workbook.getWorkbook(new File("roster.xls"));
+
+		WritableWorkbook lineup = Workbook.createWorkbook(new File ("4-30 optimal lu.xls"));
+		WritableSheet shh = lineup.createSheet("sheet1", 0);
+
+		Sheet sh = wb.getSheet("4.30");
+		ArrayList<Player> pg = new ArrayList<>();
+		ArrayList<Player> sg = new ArrayList<>();
+		ArrayList<Player> sf = new ArrayList<>();
+		ArrayList<Player> pf = new ArrayList<>();
+		ArrayList<Player> c = new ArrayList<>();
+
+		for (int r = 1; r < sh.getRows(); r++) {
+			String name = sh.getCell(0, r).getContents();
+			String position = sh.getCell(1, r).getContents();
+			int salary = Integer.parseInt(sh.getCell(2, r).getContents());
+			String team = sh.getCell(3, r).getContents();
+			int risk = Integer.parseInt(sh.getCell(4, r).getContents());
+			int score = Integer.parseInt(sh.getCell(5,r).getContents());
+			Player player = new Player(name, position, salary, team, risk,score);
+			if (player.position.equals("PG"))
+				pg.add(player);
+			if (player.position.equals("SG"))
+				sg.add(player);
+			if (player.position.equals("SF"))
+				sf.add(player);
+			if (player.position.equals("PF"))
+				pf.add(player);
+			if (player.position.equals("C"))
+				c.add(player);
+		}
+		// System.out.println(pg);
+
+		int column = 0;
+		int row = 0;
+
+		for (int pg1 = 0; pg1 < pg.size() - 1; pg1++)
+			for (int pg2 = pg1 + 1; pg2 < pg.size(); pg2++)
+				for (int sg1 = 0; sg1 < sg.size() - 1; sg1++)
+					for (int sg2 = sg1 + 1; sg2 < sg.size(); sg2++)
+						for (int sf1 = 0; sf1 < sf.size() - 1; sf1++)
+							for (int sf2 = sf1 + 1; sf2 < sf.size(); sf2++)
+								for (int pf1 = 0; pf1 < pf.size() - 1; pf1++)
+									for (int pf2 = pf1 + 1; pf2 < pf.size(); pf2++)
+										for (int c1 = 0; c1 < c.size(); c1++) {
+											ArrayList<Player> roster = new ArrayList<>();
+											roster.add(pg.get(pg1));
+											roster.add(pg.get(pg2));
+											roster.add(sg.get(sg1));
+											roster.add(sg.get(sg2));
+											roster.add(sf.get(sf1));
+											roster.add(sf.get(sf2));
+											roster.add(pf.get(pf1));
+											roster.add(pf.get(pf2));
+											roster.add(c.get(c1));
+
+											int sum = 0;
+											int riskSum = 0;
+											int scoreSum = 0;
+											TreeMap teamNum = new TreeMap();
+											for (Player ele : roster) {
+												sum += ele.salary;
+												riskSum += ele.risk;
+												scoreSum += ele.score;
+												if (!teamNum.containsKey(ele.team))
+													teamNum.put(ele.team, 1);
+												else
+													teamNum.put(ele.team,(int)teamNum.get(ele.team) + 1);
+											}
+											boolean moreThan4 = false;
+											for (Object ele:teamNum.values()){
+												if ((int)ele > 4)
+													moreThan4 = true;
+											}
+											//System.out.println(moreThan4);
+										//	System.out.println(teamNum.values());
+											if (moreThan4 == false && scoreSum >=300){
+												for (Player ele : roster) {
+													Label label = new Label(
+															column, row,
+															ele.name);
+													shh.addCell(label);
+													column++;
+												}
+												shh.addCell(new Label(column,row, Integer.toString(sum)));
+												shh.addCell(new Label(++column,row, Integer.toString(riskSum)));
+												shh.addCell(new Label(++column,row, Integer.toString(scoreSum)));
+
+												column = 0;
+												row++;
+											}
+										}
+		lineup.write();
+		lineup.close();
+		wb.close();
+
+	}
+}
+
+class Player {
+	public String name;
+	public String position;
+	public int salary;
+	public String team;
+	public int risk;
+	public int score;
+	
+	public Player(String name, String position, int salary, String team,
+			int risk,int score) {
+		this.name = name;
+		this.position = position;
+		this.salary = salary;
+		this.team = team;
+		this.risk = risk;
+		this.score = score;
+	}
+	
+	public Player(String name, String position, int salary, String team,
+			int risk) {
+		this.name = name;
+		this.position = position;
+		this.salary = salary;
+		this.team = team;
+		this.risk = risk;
+	}
+}

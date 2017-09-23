@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Rename Java project &apos;Lineup Generator&apos; to &apos;NBA&apos;&#x0A;- Original element: &apos;Lineup Generator&apos;&#x0A;- Renamed element: &apos;Lineup Generator&apos;&#x0A;- Update references to refactored element" description="Rename Java project &apos;Lineup Generator&apos;" flags="7" id="org.eclipse.jdt.ui.rename.java.project" input="=Lineup Generator" name="NBA" references="true" stamp="1432719037475" version="1.0"/>&#x0A;&#x0A;</session>
